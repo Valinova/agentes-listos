@@ -13,7 +13,11 @@ Son una guía ligera. Cada proyecto va en su propio momento: síguelo como está
 
 ## Cómo trabajar
 
-- Haz el cambio más pequeño que resuelva lo pedido. Antes de agregar algo, busca si el proyecto ya lo resuelve.
+- Haz el cambio más pequeño que resuelva lo pedido.
+- **Una sola fuente:** cada regla o dato vive en un solo lugar. Antes de escribir algo, busca dónde ya está; no lo copies.
+- **Sin extras:** nada de opciones, capas o código "por si acaso". Borra lo que tu cambio deje sin uso.
+- **Arregla la causa:** en un error, entiende por qué pasa antes de cambiar nada. No lo tapes con un parche.
+- **Pruebas que sirvan:** una prueba cuenta solo si la viste fallar por el motivo correcto.
 - Los errores se muestran o se registran. Nunca los escondas.
 - Si algo es costoso de revertir (datos reales, producción, dinero), explica el riesgo y pregunta antes.
 - Di qué comprobaste y qué no. Si algo sigue fallando, dilo.
