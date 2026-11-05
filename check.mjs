@@ -14,6 +14,15 @@ const run = (cmd, args) =>
   spawnSync(cmd, args, { encoding: "utf8", shell: process.platform === "win32" });
 const read = (file) => (existsSync(file) ? readFileSync(file, "utf8") : "");
 
+const parts = (version) => version.match(/(\d+)\.(\d+)\.(\d+)/)?.slice(1).map(Number);
+
+function isBehind(current, latest) {
+  const [a, b] = [parts(current), parts(latest)];
+  if (!a || !b) return false;
+  const i = a.findIndex((n, index) => n !== b[index]);
+  return i !== -1 && a[i] < b[i];
+}
+
 async function getJson(url) {
   const res = await fetch(url, { signal: AbortSignal.timeout(15000) });
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -108,16 +117,13 @@ async function checkNodePatches(versions) {
     warns.push(`No pude revisar los parches de seguridad de Node: ${error.message}`);
     return;
   }
-  const parts = (v) => v.match(/(\d+)\.(\d+)\.(\d+)/)?.slice(1).map(Number);
   for (const version of versions) {
     const current = parts(version);
     if (!current) continue;
     // El índice viene ordenado de la versión más nueva a la más vieja.
     const patched = releases.find((r) => r.security && parts(r.version)[0] === current[0]);
     if (!patched) continue;
-    const target = parts(patched.version);
-    const behind = current[1] < target[1] || (current[1] === target[1] && current[2] < target[2]);
-    if (behind) warns.push(`Node ${current.join(".")} no tiene los parches de seguridad de ${patched.version}. Actualiza a la última versión de Node ${current[0]}.`);
+    if (isBehind(version, patched.version)) warns.push(`Node ${current.join(".")} no tiene los parches de seguridad de ${patched.version}. Actualiza a la última versión de Node ${current[0]}.`);
   }
 }
 
@@ -153,9 +159,26 @@ function checkOutdated() {
     warns.push("No pude revisar paquetes desactualizados con pnpm outdated.");
     return;
   }
+  const smaller = [];
   for (const [name, { current, latest, isDeprecated }] of Object.entries(packages)) {
     if (isDeprecated) warns.push(`${name} está abandonado por su autor (deprecated).`);
-    if (parseInt(latest) > parseInt(current)) warns.push(`${name} ${current} está atrasado: la última versión es ${latest}.`);
+    if (!isBehind(current, latest)) continue;
+    if (parts(latest)[0] > parts(current)[0]) {
+      warns.push(`${name} ${current} está atrasado: la última versión es ${latest}. Es un salto grande: hazlo solo y pruébalo.`);
+    } else {
+      smaller.push(`${name} ${current} → ${latest}`);
+    }
+  }
+  if (smaller.length > 0) warns.push(`Actualizaciones menores disponibles: ${smaller.join(", ")}.`);
+}
+
+function checkPnpmVersion() {
+  const current = run("pnpm", ["--version"]).stdout?.trim();
+  const latest = run("pnpm", ["view", "pnpm", "version"]).stdout?.trim();
+  if (!parts(current ?? "") || !parts(latest ?? "")) {
+    warns.push("No pude revisar si pnpm está al día.");
+  } else if (isBehind(current, latest)) {
+    warns.push(`pnpm ${current} está atrasado: la última versión es ${latest}. Corre: pnpm self-update`);
   }
 }
 
@@ -173,6 +196,7 @@ await checkNode(pkg);
 checkFiles();
 checkAudit();
 checkOutdated();
+checkPnpmVersion();
 
 for (const warning of warns) console.log(`🟡 ${warning}`);
 for (const failure of fails) console.log(`🔴 ${failure}`);

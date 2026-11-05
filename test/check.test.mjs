@@ -10,8 +10,8 @@ import { fileURLToPath } from "node:url";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 
-function project(mutate = () => {}) {
-  const dir = mkdtempSync(join(tmpdir(), "base-segura-"));
+function project(mutate = () => {}, env = process.env) {
+  const dir = mkdtempSync(join(tmpdir(), "agentes-listos-"));
   for (const file of ["package.json", "pnpm-workspace.yaml", "pnpm-lock.yaml"]) {
     copyFileSync(join(root, file), join(dir, file));
   }
@@ -29,9 +29,17 @@ function project(mutate = () => {}) {
   };
   sh("git", "init", "-q");
   mutate({ dir, sh, pkg, write: (name, text) => writeFileSync(join(dir, name), text) });
-  const out = spawnSync("node", [join(root, "check.mjs")], { cwd: dir, encoding: "utf8" });
+  const out = spawnSync("node", [join(root, "check.mjs")], { cwd: dir, encoding: "utf8", env });
   rmSync(dir, { recursive: true, force: true });
   return out;
+}
+
+// Un pnpm real que dice ser viejo: el pnpm de CI siempre es el último.
+function withOldPnpm() {
+  const bin = mkdtempSync(join(tmpdir(), "agentes-listos-bin-"));
+  const real = spawnSync("sh", ["-c", "command -v pnpm"], { encoding: "utf8" }).stdout.trim();
+  writeFileSync(join(bin, "pnpm"), `#!/bin/sh\n[ "$1" = "--version" ] && { echo 12.0.0; exit 0; }\nexec "${real}" "$@"\n`, { mode: 0o755 });
+  return { ...process.env, PATH: `${bin}:${process.env.PATH}` };
 }
 
 const weaken = (from, to) => ({ dir, write }) =>
@@ -69,6 +77,7 @@ for (const [name, message, mutate] of red) {
 // Lo que no pone en riesgo a nadie todavía avisa, pero no debe estorbar.
 const yellow = [
   ["TypeScript atrasado", /typescript 5\.4\.5 está atrasado/, ({ sh }) => sh("pnpm", "add", "-D", "--ignore-scripts", "typescript@5.4.5")],
+  ["paquete con actualización menor", /Actualizaciones menores disponibles: ms 2\.0\.0 →/, ({ sh }) => sh("pnpm", "add", "--ignore-scripts", "ms@2.0.0")],
   ["sin git", /Sin git puedes perder/, ({ dir }) => rmSync(join(dir, ".git"), { recursive: true, force: true })],
   ["sin CODEOWNERS", /Sin .github\/CODEOWNERS/, ({ dir }) => rmSync(join(dir, ".github/CODEOWNERS"))],
   ["Node sin parches de seguridad", /Node 24\.1\.0 no tiene/, ({ write }) => write(".nvmrc", "24.1.0\n")],
@@ -81,3 +90,9 @@ for (const [name, message, mutate] of yellow) {
     assert.match(out.stdout, message);
   });
 }
+
+test("amarillo: pnpm atrasado", () => {
+  const out = project(undefined, withOldPnpm());
+  assert.equal(out.status, 0, out.stdout);
+  assert.match(out.stdout, /pnpm 12\.0\.0 está atrasado.*pnpm self-update/);
+});
