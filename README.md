@@ -31,8 +31,8 @@ flowchart LR
 | 📖 Reglas del agente | [`AGENTS.md`](AGENTS.md) | `~/.claude/CLAUDE.md`, `~/.codex/AGENTS.md` | ✅ | ✅ |
 | 🚫 Bloqueos de instalación | [`.claude/settings.json`](.claude/settings.json), [`.codex/rules/`](.codex/rules/agentes-listos.rules) | `~/.claude/settings.json`, `~/.codex/rules/` | ✅ | ✅ |
 | 🔍 Revisar proyecto | [`skills/revisar-proyecto/`](skills/revisar-proyecto/SKILL.md) | `~/.claude/skills/`, `~/.codex/skills/` | ✅ | ✅ |
-| 📊 Diagramas en el chat | [`mods/diagrams/`](mods/diagrams) | Plugin de Claude Code | ✅ | ➖ |
-| 🔋 Medidores de uso | [`mods/usage-meters/`](mods/usage-meters) | Plugin de Claude Code | ✅ | ➖ |
+| 📊 Diagramas en el chat | [`mods/diagrams/`](mods/diagrams) | `~/.claude/settings.json` | ✅ | ➖ |
+| 🔋 Medidores de uso | [`mods/usage-meters/`](mods/usage-meters) | `~/.claude/settings.json` | ✅ | ➖ |
 | 📦 Espera de 48 horas | [`SETUP.md`](SETUP.md) | Configuración global de pnpm y npm | ✅ | ✅ |
 | 🧩 Base de un proyecto | [`check.mjs`](check.mjs), [`pnpm-workspace.yaml`](pnpm-workspace.yaml), [`.github/`](.github) | Cada proyecto, si aceptas | ✅ | ✅ |
 

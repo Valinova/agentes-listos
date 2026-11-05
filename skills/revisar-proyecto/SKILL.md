@@ -28,7 +28,7 @@ Ordena por lo que más daño puede causar. Por cada punto: qué pasa, qué riesg
 
 Haz un cambio a la vez y comprueba que la app siga funcionando.
 
-- **Copia** desde `~/.agentes-listos`: `check.mjs`, `pnpm-workspace.yaml`, `.github/dependabot.yml` y `.github/workflows/check.yml`. Agrega `.gitignore` a lo existente y copia `devEngines` y el script `check` a `package.json`.
+- **Copia** desde `~/.agentes-listos`: `check.mjs`, `pnpm-workspace.yaml` y `.github/workflows/check.yml`. Agrega `.gitignore` a lo existente y copia `devEngines` y el script `check` a `package.json`.
 - **Pasa a pnpm** conservando versiones: `pnpm import`, borra los otros lockfiles y corre `sfw pnpm install`.
 - **Secretos:** deja solo claves de desarrollo en `.env.local`, fuera de git, y las de producción en el panel de su proveedor. En equipos o apps con datos reales, recomienda un gestor de contraseñas.
 - **Node:** declara 24 o 26. Un proyecto nuevo usa 26 si su hosting y sus paquetes lo soportan; si no, 24. Revisa también la versión configurada en el hosting.

@@ -24,12 +24,7 @@ Explica cada paso en una frase simple. Conserva toda la configuración que ya ex
    - En `~/.claude/CLAUDE.md`, agrega la línea `@~/.agentes-listos/AGENTS.md`.
    - En `~/.claude/settings.json`, agrega a `permissions.deny` cada regla de `~/.agentes-listos/.claude/settings.json`.
    - Enlaza `~/.agentes-listos/skills/revisar-proyecto` en `~/.claude/skills/revisar-proyecto`.
-   - Instala los extras visuales. Necesitan Claude Code 2.1.287 o más reciente; si es una actualización, corre también `claude plugin marketplace update agentes-listos`.
-     ```sh
-     claude plugin marketplace add ~/.agentes-listos
-     claude plugin install diagrams@agentes-listos
-     claude plugin install usage-meters@agentes-listos
-     ```
+   - Activa los extras visuales (necesitan Claude Code 2.1.287 o más reciente): en `env` de `~/.claude/settings.json`, agrega a `CLAUDE_CODE_PLUGIN_DIRS` el valor `~/.agentes-listos/mods/diagrams:~/.agentes-listos/mods/usage-meters`, separado con `:` de lo que ya tenga.
 
 5. **Codex**, si está instalado.
    - En `~/.codex/AGENTS.md`, deja el contenido de `~/.agentes-listos/AGENTS.md` entre `<!-- agentes-listos -->` y `<!-- /agentes-listos -->`, reemplazando lo que ya haya entre esas marcas.
