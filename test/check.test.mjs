@@ -55,7 +55,6 @@ const red = [
   ["Node 20 declarado", /Node 20 perdió soporte/, ({ pkg }) => pkg((p) => { p.engines = { node: ">=20" }; })],
   ["Node viejo en .nvmrc", /Node 18 perdió soporte/, ({ write }) => write(".nvmrc", "18.19.0\n")],
   [".env dentro de git", /\.env está en git/, ({ write, sh }) => { write(".env", "CLAVE=x\n"); sh("git", "add", ".env"); }],
-  ["sin CODEOWNERS", /Falta .github\/CODEOWNERS/, ({ dir }) => rmSync(join(dir, ".github/CODEOWNERS"))],
   ["vulnerabilidad alta", /pnpm audit/, ({ sh }) => sh("pnpm", "add", "--lockfile-only", "lodash@4.17.15")],
 ];
 
@@ -67,8 +66,18 @@ for (const [name, message, mutate] of red) {
   });
 }
 
-test("TypeScript atrasado avisa, pero no bloquea", () => {
-  const out = project(({ sh }) => sh("pnpm", "add", "-D", "--ignore-scripts", "typescript@5.4.5"));
-  assert.equal(out.status, 0, out.stdout);
-  assert.match(out.stdout, /typescript 5\.4\.5 está atrasado/);
-});
+// Lo que no pone en riesgo a nadie todavía avisa, pero no debe estorbar.
+const yellow = [
+  ["TypeScript atrasado", /typescript 5\.4\.5 está atrasado/, ({ sh }) => sh("pnpm", "add", "-D", "--ignore-scripts", "typescript@5.4.5")],
+  ["sin git", /Sin git puedes perder/, ({ dir }) => rmSync(join(dir, ".git"), { recursive: true, force: true })],
+  ["sin CODEOWNERS", /Sin .github\/CODEOWNERS/, ({ dir }) => rmSync(join(dir, ".github/CODEOWNERS"))],
+  ["Node sin parches de seguridad", /Node 24\.1\.0 no tiene/, ({ write }) => write(".nvmrc", "24.1.0\n")],
+];
+
+for (const [name, message, mutate] of yellow) {
+  test(`amarillo: ${name}`, () => {
+    const out = project(mutate);
+    assert.equal(out.status, 0, out.stdout);
+    assert.match(out.stdout, message);
+  });
+}

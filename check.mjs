@@ -4,6 +4,7 @@ import { spawnSync } from "node:child_process";
 import { existsSync, readFileSync } from "node:fs";
 
 const SCHEDULE = "https://raw.githubusercontent.com/nodejs/Release/main/schedule.json";
+const RELEASES = "https://nodejs.org/dist/index.json";
 const MIN_RELEASE_AGE = 2880;
 
 const fails = [];
@@ -12,6 +13,12 @@ const warns = [];
 const run = (cmd, args) =>
   spawnSync(cmd, args, { encoding: "utf8", shell: process.platform === "win32" });
 const read = (file) => (existsSync(file) ? readFileSync(file, "utf8") : "");
+
+async function getJson(url) {
+  const res = await fetch(url, { signal: AbortSignal.timeout(15000) });
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  return res.json();
+}
 
 function checkLockfiles() {
   for (const file of ["package-lock.json", "npm-shrinkwrap.json", "yarn.lock", "bun.lock", "bun.lockb"]) {
@@ -78,9 +85,7 @@ async function checkNode(pkg) {
   const majors = new Set(declared.map((v) => String(v ?? "").match(/\d+/)?.[0]).filter(Boolean));
   let schedule;
   try {
-    const res = await fetch(SCHEDULE, { signal: AbortSignal.timeout(15000) });
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    schedule = await res.json();
+    schedule = await getJson(SCHEDULE);
   } catch (error) {
     fails.push(`No pude consultar qué versiones de Node siguen vigentes: ${error.message}`);
     return;
@@ -92,12 +97,34 @@ async function checkNode(pkg) {
       fails.push(`Node ${major} perdió soporte el ${end} y ya no recibe parches de seguridad. Actualiza a una versión vigente.`);
     }
   }
+  await checkNodePatches([process.version, read(".nvmrc"), read(".node-version")]);
+}
+
+async function checkNodePatches(versions) {
+  let releases;
+  try {
+    releases = await getJson(RELEASES);
+  } catch (error) {
+    warns.push(`No pude revisar los parches de seguridad de Node: ${error.message}`);
+    return;
+  }
+  const parts = (v) => v.match(/(\d+)\.(\d+)\.(\d+)/)?.slice(1).map(Number);
+  for (const version of versions) {
+    const current = parts(version);
+    if (!current) continue;
+    // El índice viene ordenado de la versión más nueva a la más vieja.
+    const patched = releases.find((r) => r.security && parts(r.version)[0] === current[0]);
+    if (!patched) continue;
+    const target = parts(patched.version);
+    const behind = current[1] < target[1] || (current[1] === target[1] && current[2] < target[2]);
+    if (behind) warns.push(`Node ${current.join(".")} no tiene los parches de seguridad de ${patched.version}. Actualiza a la última versión de Node ${current[0]}.`);
+  }
 }
 
 function checkFiles() {
   const tracked = run("git", ["ls-files"]);
   if (tracked.status !== 0) {
-    fails.push("Esta carpeta no es un repositorio de git. Corre: git init");
+    warns.push("Sin git puedes perder tu trabajo. Pídele al agente que lo configure.");
   } else {
     for (const file of tracked.stdout.split("\n")) {
       if (/(^|\/)\.env(\.[^/]*)?$/.test(file)) {
@@ -106,7 +133,7 @@ function checkFiles() {
     }
   }
   if (!existsSync(".github/CODEOWNERS")) {
-    fails.push("Falta .github/CODEOWNERS: alguien debe aprobar los paquetes nuevos.");
+    warns.push("Sin .github/CODEOWNERS nadie tiene que aprobar los paquetes nuevos. Agrégalo si hay un responsable.");
   }
 }
 
