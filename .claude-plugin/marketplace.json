@@ -1,0 +1,8 @@
+{
+  "name": "agentes-listos",
+  "owner": { "name": "Valinova" },
+  "plugins": [
+    { "name": "diagrams", "source": "./mods/diagrams" },
+    { "name": "usage-meters", "source": "./mods/usage-meters" }
+  ]
+}
