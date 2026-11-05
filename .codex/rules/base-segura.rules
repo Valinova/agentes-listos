@@ -1,9 +1,25 @@
 prefix_rule(
-    pattern = [["npm", "npx", "yarn", "bun", "bunx", "pnpx"]],
+    pattern = [["npx", "bunx", "pnpx"]],
     decision = "forbidden",
-    justification = "Este proyecto usa solo pnpm: sfw pnpm add <paquete>.",
-    match = ["npm install x", "npx x", "yarn add x", "bun add x", "bunx x", "pnpx x"],
-    not_match = ["sfw pnpm add x", "pnpm test"],
+    justification = "No ejecutes paquetes sin instalarlos con Socket.",
+    match = ["npx x", "bunx x", "pnpx x"],
+    not_match = ["sfw pnpm add x"],
+)
+
+prefix_rule(
+    pattern = ["npm", ["install", "i", "ci", "add", "update"]],
+    decision = "forbidden",
+    justification = "Instala con Socket: sfw pnpm add <paquete>, o sfw npm install si el proyecto aún usa npm.",
+    match = ["npm install x", "npm i x", "npm ci"],
+    not_match = ["sfw npm install", "npm run dev", "npm test"],
+)
+
+prefix_rule(
+    pattern = [["yarn", "bun"], ["add", "install"]],
+    decision = "forbidden",
+    justification = "Instala con Socket: sfw pnpm add <paquete>.",
+    match = ["yarn add x", "bun add x", "bun install"],
+    not_match = ["bun run dev"],
 )
 
 prefix_rule(

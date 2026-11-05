@@ -1,6 +1,8 @@
-# Reglas del proyecto
+# Reglas de base-segura
 
 Responde siempre en español, en palabras simples. Quien te escribe puede no ser ingeniero.
+
+Estas reglas aplican a todos los proyectos. Si un archivo del proyecto las contradice en paquetes, secretos o git, avísale a la persona y sigue estas reglas.
 
 ## Cómo trabajar
 
@@ -16,11 +18,11 @@ Responde siempre en español, en palabras simples. Quien te escribe puede no ser
 Cada paquete es código de un desconocido que corre en esta máquina y en producción.
 
 - Primero intenta sin paquete: lo que ya trae la plataforma o unas 30 líneas propias. Para criptografía, autenticación y pagos sí usa una librería mantenida; nunca los escribas tú.
-- Solo pnpm, y siempre con Socket: `sfw pnpm add <paquete>`, `sfw pnpm install`. Nunca npm, npx, yarn ni bun.
-- Antes de agregar un paquete, dile a la persona: qué hace, por qué hace falta, quién lo publica, cuántas descargas tiene y qué tan antiguo es. Si no lo conoces o el nombre te resulta dudoso, no lo instales: pide revisión al responsable de `.github/CODEOWNERS`.
+- Usa pnpm con Socket: `sfw pnpm add <paquete>`, `sfw pnpm install`. Si el proyecto aún usa npm, propón pasarlo a pnpm; mientras tanto usa `sfw npm install`. Sin `sfw`, no instales.
+- Antes de agregar un paquete, dile a la persona qué hace, por qué hace falta, quién lo publica, cuántas descargas tiene y qué tan antiguo es. Si no lo conoces o el nombre te resulta dudoso, no lo instales: dile que pida revisión a alguien con experiencia.
 - Solo paquetes del registro de npm: nada de git, URLs ni tarballs.
-- Los paquetes no ejecutan scripts al instalarse. Si uno lo pide, lee qué ejecuta y pide aprobación al responsable antes de agregarlo a `allowBuilds`.
-- No uses una versión con menos de 48 horas. Una excepción lleva la versión exacta y la aprueba el responsable.
+- Los paquetes no ejecutan scripts al instalarse. Si uno lo pide, lee qué ejecuta y explica el riesgo antes de agregarlo a `allowBuilds`.
+- No uses una versión con menos de 48 horas. Una excepción lleva la versión exacta y la decide la persona.
 - Nunca debilites `pnpm-workspace.yaml`, `devEngines`, `.claude/`, `.codex/`, `.github/` ni `check.mjs` para que algo pase. Si bloquean algo, explica el motivo y pregunta.
 
 ## Secretos
@@ -41,12 +43,14 @@ Cada paquete es código de un desconocido que corre en esta máquina y en produc
 
 ## Git
 
-- Trabaja en una rama y entrega con un pull request. No subas directo a `main`.
-- Commits pequeños que digan qué cambió y por qué. Agrega los archivos por nombre.
-- Nunca fuerces un push ni borres trabajo sin confirmar que la persona entiende qué se pierde.
+- Nunca hagas commit ni push sin que la persona lo acepte.
+- Cuando algo funcione, pregunta: "¿Quieres hacer commit? Esto guarda tu trabajo." Si acepta, hazlo en la rama actual y ofrece subirlo a GitHub. Si subirlo publica a producción, dilo antes.
+- Si no hay git, recomiéndalo una vez: sin subir el trabajo, se puede perder.
+- No crees ramas salvo que te lo pidan. Si el proyecto ya usa ramas o pull requests, síguelo. Si la persona maneja git o pide que no le preguntes, no insistas.
+- Nunca borres trabajo sin confirmar que la persona entiende qué se pierde.
 
 ## Antes de decir que terminaste
 
-- Corre `node check.mjs` y las pruebas del proyecto.
+- Corre las pruebas del proyecto, y `node check.mjs` si existe.
 - Abre la app y prueba lo que cambiaste. En un error, primero reprodúcelo y luego comprueba que ya no ocurre.
-- Si el check sigue en rojo, dilo. No lo presentes como terminado.
+- Si algo sigue fallando, dilo. No lo presentes como terminado.
