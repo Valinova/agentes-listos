@@ -4,7 +4,6 @@ import { spawnSync } from "node:child_process";
 import { existsSync, readFileSync } from "node:fs";
 
 const SCHEDULE = "https://raw.githubusercontent.com/nodejs/Release/main/schedule.json";
-const RELEASES = "https://nodejs.org/dist/index.json";
 const MIN_RELEASE_AGE = 2880;
 
 const fails = [];
@@ -105,25 +104,6 @@ async function checkNode(pkg) {
     if (end && end < today) {
       fails.push(`Node ${major} perdió soporte el ${end} y ya no recibe parches de seguridad. Actualiza a una versión vigente.`);
     }
-  }
-  await checkNodePatches([process.version, read(".nvmrc"), read(".node-version")]);
-}
-
-async function checkNodePatches(versions) {
-  let releases;
-  try {
-    releases = await getJson(RELEASES);
-  } catch (error) {
-    warns.push(`No pude revisar los parches de seguridad de Node: ${error.message}`);
-    return;
-  }
-  for (const version of versions) {
-    const current = parts(version);
-    if (!current) continue;
-    // El índice viene ordenado de la versión más nueva a la más vieja.
-    const patched = releases.find((r) => r.security && parts(r.version)[0] === current[0]);
-    if (!patched) continue;
-    if (isBehind(version, patched.version)) warns.push(`Node ${current.join(".")} no tiene los parches de seguridad de ${patched.version}. Actualiza a la última versión de Node ${current[0]}.`);
   }
 }
 

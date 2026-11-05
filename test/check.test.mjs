@@ -80,7 +80,6 @@ const yellow = [
   ["paquete con actualización menor", /Actualizaciones menores disponibles: ms 2\.0\.0 →/, ({ sh }) => sh("pnpm", "add", "--ignore-scripts", "ms@2.0.0")],
   ["sin git", /Sin git puedes perder/, ({ dir }) => rmSync(join(dir, ".git"), { recursive: true, force: true })],
   ["sin CODEOWNERS", /Sin .github\/CODEOWNERS/, ({ dir }) => rmSync(join(dir, ".github/CODEOWNERS"))],
-  ["Node sin parches de seguridad", /Node 24\.1\.0 no tiene/, ({ write }) => write(".nvmrc", "24.1.0\n")],
 ];
 
 for (const [name, message, mutate] of yellow) {
