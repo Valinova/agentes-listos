@@ -19,7 +19,7 @@ flowchart LR
     S[SETUP.md] --> M[Tu máquina]
     M --> A[Reglas del agente]
     M --> B[Bloqueos de instalación]
-    M --> C[Revisar proyecto]
+    M --> C[Habilidades]
     M --> D[Extras visuales]
     M --> E[pnpm y Socket]
     A & B & C & D & E --> P[Todos tus proyectos]
@@ -30,7 +30,7 @@ flowchart LR
 |---|---|---|---|---|
 | 📖 Reglas del agente | [`AGENTS.md`](AGENTS.md) | `~/.claude/CLAUDE.md`, `~/.codex/AGENTS.md` | ✅ | ✅ |
 | 🚫 Bloqueos de instalación | [`.claude/settings.json`](.claude/settings.json), [`.codex/rules/`](.codex/rules/agentes-listos.rules) | `~/.claude/settings.json`, `~/.codex/rules/` | ✅ | ✅ |
-| 🔍 Revisar proyecto | [`skills/revisar-proyecto/`](skills/revisar-proyecto/SKILL.md) | `~/.claude/skills/`, `~/.codex/skills/` | ✅ | ✅ |
+| 🔍 Habilidades | [`skills/`](skills) | `~/.claude/skills/`, `~/.codex/skills/` | ✅ | ✅ |
 | 📊 Diagramas en el chat | [`mods/diagrams/`](mods/diagrams) | `~/.claude/settings.json` | ✅ | ➖ |
 | 🔋 Medidores de uso | [`mods/usage-meters/`](mods/usage-meters) | `~/.claude/settings.json` | ✅ | ➖ |
 | 📦 Espera de 48 horas | [`SETUP.md`](SETUP.md) | Configuración global de pnpm y npm | ✅ | ✅ |
@@ -55,9 +55,19 @@ flowchart LR
 - **Cuida tus claves** y comprueba permisos en el servidor.
 - **Te muestra diagramas** para explicarte cómo funciona algo, en Claude Code.
 
-## Tu habilidad
+## Tus habilidades
 
-Dile **"revisa mi proyecto"** o usa `/revisar-proyecto` en Claude Code. Revisa trabajo sin guardar, paquetes, claves, permisos y código fuera de control. Te da una lista por prioridad y no cambia nada sin tu aprobación. Úsala al empezar con un proyecto y antes de publicar algo importante.
+Pídeselo con tus palabras. Ninguna cambia nada de tu proyecto sin decírtelo, y ninguna hace commit sola.
+
+| Dile | Qué hace | Cuándo |
+|---|---|---|
+| **"Revisa mi proyecto"** | Muestra paquetes, claves, permisos y trabajo sin guardar, por prioridad | Al empezar con un proyecto o antes de publicar |
+| **"Simplifica esto"** | Propone qué borrar o unificar y aplica lo que apruebes | Cuando el código se salga de control |
+| **"Revisa lo que acabo de hacer"** | Corrige errores claros en los cambios recientes | Antes de guardar o publicar |
+| **"Revisa los comentarios"** | Corrige los falsos y quita los que sobran | De vez en cuando |
+| *(se aplica sola)* | Evita `useEffect` innecesarios en React | Al escribir React |
+
+La primera vez, el agente también revisa lo que tenías acumulado en tu configuración y te dice qué estorba. No quita nada sin tu aprobación y guarda una copia.
 
 ## Cómo pedirle cosas
 
