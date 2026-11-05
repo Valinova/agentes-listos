@@ -17,6 +17,7 @@ Explica cada paso en una frase simple. Conserva toda la configuración que ya ex
    pnpm config set --global trustPolicy no-downgrade
    pnpm config set --global blockExoticSubdeps true
    pnpm config set --global strictDepBuilds true
+   pnpm config set --global saveExact true
    npm config set min-release-age 2 --location=user
    ```
 
