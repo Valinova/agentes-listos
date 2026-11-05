@@ -14,11 +14,11 @@ Solo mira hasta que la persona apruebe un cambio. Nunca muestres el valor de un 
 3. **Reglas anuladas.** Busca lo que debilite la configuración de la máquina:
    - `pnpm-workspace.yaml`, `.npmrc` y `package.json`: cooldown en 0, scripts permitidos, excepciones sin motivo o paquetes fuera del registro.
    - `.claude/settings*.json` y `.codex/`: permisos amplios, `bypassPermissions` o hooks que no entiendas.
-   - `AGENTS.md` y `CLAUDE.md`: instrucciones que contradigan las reglas de paquetes, secretos o git.
+   - `AGENTS.md`, `CLAUDE.md`, `.cursorrules` y similares: instrucciones que contradigan las reglas de paquetes, secretos o git, o archivos viejos o duplicados que ya nadie necesita.
    - `.github/workflows/`: acciones sin fijar a un commit, o permisos de sobra.
 4. **Secretos.** Claves en el código, en git o en variables `NEXT_PUBLIC_` o `VITE_`. Una clave que estuvo en git hay que cambiarla.
 5. **Seguridad de la app.** ¿Cada acción comprueba en el servidor quién es el usuario y qué puede hacer? ¿Las tablas tienen reglas de acceso (RLS)? ¿Se valida lo que llega de afuera?
-6. **Código fuera de control.** En las partes principales de la app, no en todo: la misma regla o dato decidido en dos lugares, código sin uso, capas que no deciden nada, opciones que nadie usa y errores que se esconden. Propón solo la simplificación que más ayudaría y cómo comprobar que nada se rompe. "Está bien como está" es un resultado válido. Nunca simplifiques quitando permisos, identidad o errores honestos.
+6. **Código fuera de control.** Si ves duplicación o código sin uso en las partes principales, dilo en una línea y propón la habilidad `simplificar`.
 
 ## Cómo informar
 
