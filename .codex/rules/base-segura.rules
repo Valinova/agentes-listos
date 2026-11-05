@@ -1,0 +1,31 @@
+prefix_rule(
+    pattern = [["npm", "npx", "yarn", "bun", "bunx", "pnpx"]],
+    decision = "forbidden",
+    justification = "Este proyecto usa solo pnpm: sfw pnpm add <paquete>.",
+    match = ["npm install x", "npx x", "yarn add x", "bun add x", "bunx x", "pnpx x"],
+    not_match = ["sfw pnpm add x", "pnpm test"],
+)
+
+prefix_rule(
+    pattern = ["pnpm", ["add", "dlx", "install", "i", "update", "up"]],
+    decision = "forbidden",
+    justification = "Instala siempre a través de Socket: sfw pnpm add <paquete>, sfw pnpm install.",
+    match = ["pnpm add x", "pnpm install", "pnpm dlx x", "pnpm up x"],
+    not_match = ["sfw pnpm add x", "sfw pnpm install", "pnpm test"],
+)
+
+prefix_rule(
+    pattern = ["git", "push", ["--force", "-f", "--delete"]],
+    decision = "forbidden",
+    justification = "Nunca fuerces un push ni borres una rama remota.",
+    match = ["git push --force origin main", "git push -f origin main", "git push --delete origin main"],
+    not_match = ["git push origin feature"],
+)
+
+prefix_rule(
+    pattern = ["rm", ["-rf", "-fr"], ["/", "/*", "~", "~/*", "$HOME", "$HOME/*", "..", "../*"]],
+    decision = "forbidden",
+    justification = "Nunca borres la raíz, tu carpeta personal ni la carpeta superior.",
+    match = ["rm -rf /", "rm -rf ~", "rm -fr .."],
+    not_match = ["rm -rf ./dist"],
+)

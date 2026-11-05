@@ -1,0 +1,12 @@
+{
+  "name": "base-segura",
+  "private": true,
+  "version": "0.1.0",
+  "scripts": {
+    "check": "node check.mjs"
+  },
+  "devEngines": {
+    "packageManager": { "name": "pnpm", "onFail": "error" },
+    "runtime": { "name": "node", "version": ">=24", "onFail": "error" }
+  }
+}
